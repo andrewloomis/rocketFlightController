@@ -1,5 +1,7 @@
 {
-    "board": "arduino:avr:pro",
-    "configuration": "cpu=8MHzatmega328",
-    "sketch": "main.ino"
+    "board": "m328pb:avr:atmega328pbcc",
+    "configuration": "speed=8mhz",
+    "sketch": "recovery.ino",
+    "programmer": "AVRISP mkII",
+    "port": "/dev/ttyUSB0"
 }

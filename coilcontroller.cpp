@@ -8,8 +8,13 @@ CoilController::CoilController()
     pinMode(6, OUTPUT);
 }
 
-void CoilController::coilPulse(Centimeters altitude)
+void CoilController::startPulse(Meters altitude)
 {
     risingEdgeTime = micros();
+
+}
+
+void finishPulse()
+{
 
 }

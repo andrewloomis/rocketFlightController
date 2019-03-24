@@ -6,6 +6,7 @@
                 "ARDUINO=10800"
             ],
             "includePath": [
+                "/home/andrew/.arduino15/packages/m328pb/hardware/avr/1.1.3/**",
                 "/home/andrew/Applications/arduino-1.8.9/tools/**",
                 "/home/andrew/Applications/arduino-1.8.9/hardware/arduino/avr/**",
                 "${workspaceRoot}",
@@ -28,9 +29,7 @@
                     "/home/andrew/Documents/Arduino/libraries/**"
                 ]
             },
-            "forcedInclude": [
-                "/home/andrew/Applications/arduino-1.8.9/hardware/arduino/avr/cores/arduino/Arduino.h"
-            ],
+            "forcedInclude": [],
             "intelliSenseMode": "clang-x64",
             "cStandard": "c11",
             "cppStandard": "c++17"

@@ -7,7 +7,8 @@ class CoilController
 {
 public:
     CoilController();
-    void coilPulse(Centimeters altitude);
+    void startPulse(Meters altitude);
+    void finishPulse();
 
 private:
     unsigned int risingEdgeTime = 0;
