@@ -1,7 +1,7 @@
 {
     "board": "m328pb:avr:atmega328pbcc",
     "configuration": "speed=8mhz",
-    "sketch": "recovery.ino",
+    "sketch": "main.ino",
     "programmer": "AVRISP mkII",
     "port": "/dev/ttyUSB0"
 }

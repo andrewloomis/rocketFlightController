@@ -79,61 +79,67 @@ void EEPROM::readMemoryBytes(uint16_t startAddress, uint8_t* buffer, uint8_t len
     i2c.readReg16Bytes(i2c_address, startAddress, buffer, length);
 }
 
-void EEPROM::writeData(uint8_t* data, uint8_t length)
+bool EEPROM::willBeFull(uint8_t additionalBytes)
 {
-    if (!full)
+    if ((workingPartition == Partition::First && (addressPtr + additionalBytes >= secondFlightStart))
+        || (workingPartition == Partition::Second && (addressPtr + additionalBytes >= 8192)))
     {
-        if ((workingPartition == Partition::First && (addressPtr + length >= secondFlightStart)) ||
-            (workingPartition == Partition::Second && (addressPtr + length >= 8192)))
+        
+        return true;
+    }
+    else return false;
+}
+
+void EEPROM::endRecording()
+{
+    full = true;
+    const char* end = "EOF";
+    uint16_t address;
+    if (workingPartition == Partition::First)
+    {
+        if (addressPtr + sizeof(end) >= secondFlightStart)
         {
-            full = true;
-            const char* end = "EOF";
-            i2c.writeReg16Bytes(i2c_address, secondFlightStart-4, (uint8_t*)end, sizeof(end));
+            address = secondFlightStart - 4;
         }
         else
         {
-            i2c.writeReg16Bytes(i2c_address, addressPtr, data, length);
-            addressPtr += length;
+            address = addressPtr;
         }
+    }
+    i2c.writeReg16Bytes(i2c_address, address, (uint8_t*)end, sizeof(end));
+}
+
+void EEPROM::writeData(uint8_t* data, uint8_t numOfBytes)
+{
+    if (full) return;
+    if (willBeFull(numOfBytes))
+    {
+        endRecording();
+    }
+    else
+    {
+        i2c.writeReg16Bytes(i2c_address, addressPtr, data, numOfBytes);
+        addressPtr += numOfBytes;
     }
 }
 
-void EEPROM::writeData(uint16_t* data, uint8_t length)
+void EEPROM::writeData(uint16_t* data, uint8_t numOfBytes)
 {
-    if (!full)
+    if (full) return;
+    if (willBeFull(numOfBytes))
     {
-        if ((workingPartition == Partition::First && (addressPtr + length*2 >= secondFlightStart)) ||
-            (workingPartition == Partition::Second && (addressPtr + length*2 >= 8192)))
-        {
-            full = true;
-            const char* end = "EOF";
-            i2c.writeReg16Bytes(i2c_address, secondFlightStart-4, (uint8_t*)end, sizeof(end));
-        }
-        else
-        {
-            i2c.writeReg16Words(i2c_address, addressPtr, data, length);
-            addressPtr += length*2;
-        }
+        endRecording();
+    }
+    else
+    {
+        i2c.writeReg16Words(i2c_address, addressPtr, data, numOfBytes/2);
+        addressPtr += numOfBytes;
     }
 }
 
 void EEPROM::writeData(uint16_t data)
 {
-    if (!full)
-    {
-        if ((workingPartition == Partition::First && (addressPtr + 2 >= secondFlightStart)) ||
-            (workingPartition == Partition::Second && (addressPtr + 2 >= 8192)))
-        {
-            full = true;
-            const char* end = "EOF";
-            i2c.writeReg16Bytes(i2c_address, secondFlightStart-4, (uint8_t*)end, sizeof(end));
-        }
-        else
-        {
-            i2c.writeReg16Words(i2c_address, addressPtr, &data, 1);
-            addressPtr += 2;
-        }
-    }
+    writeData(&data, 2);
 }
 
 uint8_t EEPROM::readDataByte(uint16_t address)
